@@ -5,7 +5,7 @@ import { SkillsSection } from "@/components/skills-section"
 import { ProjectsSection } from "@/components/projects-section"
 import { ContactSection } from "@/components/contact-section"
 import { CVSection } from "@/components/cv-section"
-import { ReflectionsSection } from "@/components/reflections-section"
+import { ExperienceSection } from "@/components/reflections-section"
 
 export default function Page() {
   return (
@@ -16,7 +16,7 @@ export default function Page() {
         <AboutSection />
         <CVSection />
         <ProjectsSection />
-        <ReflectionsSection />
+        <ExperienceSection />
         <ContactSection />
       </main>
     </>

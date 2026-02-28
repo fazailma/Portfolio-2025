@@ -163,106 +163,140 @@ function Band({ maxSpeed = 40, minSpeed = 0 }: BandProps) {
       dir.copy(vec).sub(state.camera.position).normalize();
       vec.add(dir.multiplyScalar(state.camera.position.length()));
       
-      // Calculate target position
-      let targetX = vec.x - dragged.x;
-      let targetY = vec.y - dragged.y;
-      let targetZ = vec.z - dragged.z;
-      
       // Get card's anchor position (fixed point at top)
       const anchorX = 0;
       const anchorY = 4;
       const anchorZ = 0;
       
-      // Separate constraints for each axis
-      const distX = targetX - anchorX;
-      const distY = targetY - anchorY;
-      const distZ = targetZ - anchorZ;
+      // Calculate initial target position
+      let targetX = vec.x - dragged.x;
+      let targetY = vec.y - dragged.y;
+      let targetZ = vec.z - dragged.z;
       
-      // Max distance per axis - SYMMETRIC for left/right, up/down
-      const maxDistX = 2.5;  // Left-Right limit - tighter
-      const maxDistZ = 2.5;  // Front-Back limit - tighter
-      const maxDistYDown = 5.5;  // Downward limit
+      // Calculate distances from anchor
+      let distX = targetX - anchorX;
+      let distY = targetY - anchorY;
+      let distZ = targetZ - anchorZ;
+      
+      // Max distance constraints - generous but safe
+      const maxDistX = 3.2;  // Left-Right limit
+      const maxDistZ = 3.0;  // Front-Back limit
+      const maxDistYDown = 6.0;  // Downward limit
       const maxDistYUp = 1.5;    // Upward limit
       
-      // Constrain X axis (left-right) - symmetric
-      if (distX > maxDistX) {
-        targetX = anchorX + maxDistX;
-      } else if (distX < -maxDistX) {
-        targetX = anchorX - maxDistX;
+      // Clamp X axis (left-right) with smooth enforcement
+      if (Math.abs(distX) > maxDistX) {
+        distX = Math.sign(distX) * maxDistX;
+        targetX = anchorX + distX;
       }
       
-      // Constrain Z axis (front-back) - symmetric
-      if (distZ > maxDistZ) {
-        targetZ = anchorZ + maxDistZ;
-      } else if (distZ < -maxDistZ) {
-        targetZ = anchorZ - maxDistZ;
+      // Clamp Z axis (front-back) with smooth enforcement
+      if (Math.abs(distZ) > maxDistZ) {
+        distZ = Math.sign(distZ) * maxDistZ;
+        targetZ = anchorZ + distZ;
       }
       
-      // Constrain Y axis (up-down) - different limits for each direction
+      // Clamp Y axis (up-down) with asymmetric limits
       if (distY < -maxDistYDown) {
-        targetY = anchorY - maxDistYDown;
+        distY = -maxDistYDown;
+        targetY = anchorY + distY;
       } else if (distY > maxDistYUp) {
-        targetY = anchorY + maxDistYUp;
+        distY = maxDistYUp;
+        targetY = anchorY + distY;
       }
       
       // Wake up all joints to prevent sleeping
-      [card, j1, j2, j3, fixed].forEach(ref => ref.current?.wakeUp());
-      
-      // Set card position with kinematic mode
-      card.current?.setNextKinematicTranslation({
-        x: targetX,
-        y: targetY,
-        z: targetZ
+      [card, j1, j2, j3, fixed].forEach(ref => {
+        if (ref.current?.wakeUp) ref.current.wakeUp();
       });
+      
+      // Set card position with kinematic mode - safe position update
+      try {
+        if (card.current?.setNextKinematicTranslation) {
+          card.current.setNextKinematicTranslation({
+            x: targetX,
+            y: targetY,
+            z: targetZ
+          });
+        }
+      } catch (e) {
+        console.error('Error setting kinematic translation:', e);
+      }
     }
     
     if (fixed.current) {
       [j1, j2].forEach(ref => {
-        if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
-        const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())));
-        ref.current.lerped?.lerp(
-          ref.current.translation(),
-          delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
-        );
+        if (ref.current) {
+          if (!ref.current.lerped) {
+            ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
+          }
+          const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())));
+          ref.current.lerped?.lerp(
+            ref.current.translation(),
+            delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
+          );
+        }
       });
       
-      // Update curve points
-      curve.points[0].copy(j3.current.translation());
-      curve.points[1].copy(j2.current.lerped);
-      curve.points[2].copy(j1.current.lerped);
-      curve.points[3].copy(fixed.current.translation());
-      band.current.geometry.setPoints(curve.getPoints(32));
+      // Update curve points safely
+      if (band.current && band.current.geometry) {
+        curve.points[0].copy(j3.current.translation());
+        curve.points[1].copy(j2.current.lerped || j2.current.translation());
+        curve.points[2].copy(j1.current.lerped || j1.current.translation());
+        curve.points[3].copy(fixed.current.translation());
+        try {
+          band.current.geometry.setPoints(curve.getPoints(32));
+        } catch (e) {
+          console.error('Error updating band geometry:', e);
+        }
+      }
       
       // Velocity damping for rope segments
       [j1, j2, j3].forEach(ref => {
-        if (ref.current) {
+        if (ref.current?.linvel) {
           const vel = ref.current.linvel();
           const damping = 0.84;
-          ref.current.setLinvel({
-            x: vel.x * damping,
-            y: vel.y * damping,
-            z: vel.z * damping
-          });
+          try {
+            ref.current.setLinvel({
+              x: vel.x * damping,
+              y: vel.y * damping,
+              z: vel.z * damping
+            });
+          } catch (e) {
+            // Silently ignore linvel errors
+          }
         }
       });
       
       // Apply velocity damping to card
-      const cardVel = card.current.linvel();
-      const velMagnitude = Math.sqrt(cardVel.x * cardVel.x + cardVel.y * cardVel.y + cardVel.z * cardVel.z);
-      const maxVelocity = 48;
-      
-      if (velMagnitude > maxVelocity) {
-        const scale = maxVelocity / velMagnitude;
-        card.current.setLinvel({
-          x: cardVel.x * scale,
-          y: cardVel.y * scale,
-          z: cardVel.z * scale
-        });
+      if (card.current?.linvel) {
+        const cardVel = card.current.linvel();
+        const velMagnitude = Math.sqrt(cardVel.x * cardVel.x + cardVel.y * cardVel.y + cardVel.z * cardVel.z);
+        const maxVelocity = 48;
+        
+        if (velMagnitude > maxVelocity) {
+          const scale = maxVelocity / velMagnitude;
+          try {
+            card.current.setLinvel({
+              x: cardVel.x * scale,
+              y: cardVel.y * scale,
+              z: cardVel.z * scale
+            });
+          } catch (e) {
+            // Silently ignore setLinvel errors
+          }
+        }
       }
       
-      ang.copy(card.current.angvel());
-      rot.copy(card.current.rotation());
-      card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
+      if (card.current?.angvel && card.current?.rotation) {
+        ang.copy(card.current.angvel());
+        rot.copy(card.current.rotation());
+        try {
+          card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
+        } catch (e) {
+          // Silently ignore angvel errors
+        }
+      }
     }
   });
 

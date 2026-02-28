@@ -5,19 +5,57 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, MapPin, Phone, Github, Linkedin, Twitter, Instagram } from "lucide-react"
+import { Mail, MapPin, Phone, Github, Linkedin, Instagram, Loader2, CheckCircle, AlertCircle } from "lucide-react"
 
 export function ContactSection() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" })
+  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
+  const [statusMessage, setStatusMessage] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
+    
+    if (!formData.name || !formData.email || !formData.message) {
+      setStatus("error")
+      setStatusMessage("Please fill in all fields")
+      return
+    }
+
+    setLoading(true)
+    setStatus("idle")
+
+    try {
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setStatus("success")
+        setStatusMessage(data.message || "Message sent successfully! I'll get back to you soon.")
+        setFormData({ name: "", email: "", message: "" })
+        
+        // Auto clear success message after 5 seconds
+        setTimeout(() => setStatus("idle"), 5000)
+      } else {
+        setStatus("error")
+        setStatusMessage("Failed to send message. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      setStatus("error")
+      setStatusMessage("An error occurred. Please try again later.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   const contactInfo = [
-    { icon: Mail, label: "Email", value: "fazaululilma@gmail.com", link: "fazaululilma@gmail.com" },
-    { icon: Phone, label: "Phone", value: "087816328168", link: "087816328168" },
+    { icon: Mail, label: "Email", value: "fazaululilma@gmail.com", link: "mailto:fazaululilma@gmail.com" },
+    { icon: Phone, label: "Phone", value: "085649908407", link: "tel:085649908407" },
     { icon: MapPin, label: "Location", value: "Surabaya", link: "#" },
   ]
 
@@ -48,6 +86,7 @@ export function ContactSection() {
                 className="rounded-xl border-gray-300 focus:border-black focus:ring-black"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                disabled={loading}
                 required
               /> 
               <Input
@@ -57,6 +96,7 @@ export function ContactSection() {
                 className="rounded-xl border-gray-300 focus:border-black focus:ring-black"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                disabled={loading}
                 required
               />
             </div>
@@ -67,16 +107,35 @@ export function ContactSection() {
               className="rounded-xl border-gray-300 focus:border-black focus:ring-black"
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              disabled={loading}
               required
             />
 
-            {/* Button dengan gaya elegan hitam-putih */}
+            {/* Status Message */}
+            {status !== "idle" && (
+              <div className={`flex items-center gap-3 p-4 rounded-xl ${
+                status === "success" 
+                  ? "bg-green-50 text-green-800 border border-green-200" 
+                  : "bg-red-50 text-red-800 border border-red-200"
+              }`}>
+                {status === "success" ? (
+                  <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                )}
+                <span className="text-sm font-medium">{statusMessage}</span>
+              </div>
+            )}
+
+            {/* Button */}
             <Button
               type="submit"
               size="lg"
-              className="w-full rounded-xl bg-black text-white hover:bg-gray-800 transition-all duration-200"
+              disabled={loading}
+              className="w-full rounded-xl bg-black text-white hover:bg-gray-800 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Send Message
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+              {loading ? "Sending..." : "Send Message"}
             </Button>
           </form>
         </Card>
@@ -108,7 +167,7 @@ export function ContactSection() {
         </div>
 
         <p className="text-sm text-gray-500 mt-12">
-          © 2025 Portfolio — Created by fazailma.
+          © 2026 Portfolio — Created by fazailma.
         </p>
       </div>
     </section>

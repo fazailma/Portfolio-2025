@@ -59,6 +59,16 @@ export function ProjectsSection() {
       link: "https://www.figma.com/proto/6q7v8WKRZuIQmwqwVcEC1Z/Untitled--Copy-?node-id=4-4&starting-point-node-id=4%3A4",
       figma: "https://www.figma.com/design/RbWYKBmkRbFVjV0Xomu1tJ/ui-ux?node-id=2006-70&t=VDwbyVC3HIyhurW2-0",
     },
+    {
+    title: "EduSmart System – Software Requirements Specification",
+    category: "SRS",
+    description:
+      "A comprehensive Software Requirements Specification (SRS) document for the duSmart platform, outlining functional and non-functional requirements, system features, user roles, and business processes to support sustainable product transactions.",
+    image: "/assets/foto12.png",
+    tags: ["System Analysis", "Requirement Gathering", "SRS Documentation", "UML"],
+    link: "https://docs.google.com/document/d/1hxHPVMc7GW1zHRsO6EvNxdm5eink2Ww8CGFwA4Rr_zk/edit?usp=sharing",
+    figma: "https://www.figma.com/design/ADM4Aqx5QWnTRsLQA5kXZf/Untitled?node-id=0-1&t=aV5AftQTSTVojVp9-1",
+  },
   ]
 
   const categories = [
@@ -66,6 +76,7 @@ export function ProjectsSection() {
     { id: "web", label: "Web" },
     { id: "mobile", label: "Mobile" },
     { id: "ui/ux", label: "UI/UX" },
+    { id: "SRS", label: "SRS" },
   ]
 
   const filteredProjects =
@@ -151,7 +162,7 @@ export function ProjectsSection() {
                     )}
 
                     {/* Code or Figma Button */}
-                    {project.category === "ui/ux" ? (
+                    {(project.category === "ui/ux" || project.category === "SRS") ? (
                       <a
                         href={project.figma}
                         target="_blank"

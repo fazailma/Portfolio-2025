@@ -54,8 +54,8 @@ export function CVSection() {
         <img
           src="/assets/tali.png"
           alt="Tali gantung"
-          className={`absolute top-[-180px] w-[180px] md:w-[220px] object-contain ${
-            isVisible ? "animate-rope-drop" : "opacity-0 translate-y-[-120px]"
+          className={`absolute top-[-180px] w-[180px] md:w-[220px] object-contain transition-all duration-500 ease-out ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[-120px]"
           }`}
           draggable={false}
         />
@@ -63,10 +63,10 @@ export function CVSection() {
 
       {/* Kertas CV */}
       <div
-        className={`relative -mt-3 z-20 origin-top shadow-lg shadow-gray-300/50 rounded-md transition-all duration-700 ${
+        className={`relative -mt-3 z-20 origin-top shadow-lg shadow-gray-300/50 rounded-md transition-all duration-700 ease-out ${
           isVisible
-            ? "animate-paper-drop"
-            : "opacity-0 translate-y-[-100px] scale-[0.95]"
+            ? "opacity-100 translate-y-0 scale-100 animate-float-subtle"
+            : "opacity-0 translate-y-[-100px] scale-95"
         }`}
       >
         <img
@@ -96,50 +96,18 @@ export function CVSection() {
 
       {/* Animasi tali & kertas */}
       <style jsx>{`
-        @keyframes ropeDrop {
-          0% {
-            opacity: 0;
-            transform: translateY(-120px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes paperDropSmooth {
-          0% {
-            opacity: 0;
-            transform: translateY(-150px) rotate(-1deg);
-          }
-          60% {
-            opacity: 1;
-            transform: translateY(10px) rotate(1deg);
-          }
-          100% {
-            transform: translateY(0) rotate(0deg);
-          }
-        }
-
-        @keyframes paperSwing {
+        @keyframes swingSide {
           0%, 100% {
-            transform: rotate(0deg);
+            transform: rotateZ(-1.5deg);
           }
-          25% {
-            transform: rotate(1deg);
-          }
-          75% {
-            transform: rotate(-1deg);
+          50% {
+            transform: rotateZ(1.5deg);
           }
         }
 
-        .animate-rope-drop {
-          animation: ropeDrop 1.2s ease-out forwards;
-        }
-
-        .animate-paper-drop {
-          animation: paperDropSmooth 1.3s ease-out 0.9s forwards,
-            paperSwing 5s ease-in-out 2.3s infinite;
+        .animate-float-subtle {
+          animation: swingSide 3s ease-in-out infinite;
+          transform-origin: top center;
         }
       `}</style>
     </section>

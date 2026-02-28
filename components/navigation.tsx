@@ -17,7 +17,7 @@ export function Navigation() {
   useLayoutEffect(() => {
     if (!mounted) return
     
-    const sections = ["hero", "about", "projects", "reflections", "contact"]
+    const sections = ["hero", "about", "projects", "experience", "contact"]
       .map((id) => document.getElementById(id))
       .filter(Boolean) as HTMLElement[]
 
@@ -86,18 +86,23 @@ export function Navigation() {
 
         {/* === DESKTOP MENU === */}
         <div className="hidden md:flex items-center gap-5">
-          {["about", "projects", "reflections", "contact"].map((section) => (
+          {[
+            { id: "about", label: "About" },
+            { id: "projects", label: "Projects" },
+            { id: "experience", label: "Experience" },
+            { id: "contact", label: "Contact" },
+          ].map(({ id, label }) => (
             <button
-              key={section}
-              onClick={() => scrollToSection(section)}
+              key={id}
+              onClick={() => scrollToSection(id)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                active === section
+                active === id
                   ? "bg-black text-white shadow-sm"
                   : "text-gray-600 hover:text-black hover:bg-black/5"
               }`}
               suppressHydrationWarning
             >
-              {section.charAt(0).toUpperCase() + section.slice(1)}
+              {label}
             </button>
           ))}
         </div>
@@ -116,18 +121,23 @@ export function Navigation() {
       {/* === MOBILE MENU === */}
       {isMobileMenuOpen && (
         <div className="md:hidden mt-3 px-6 py-3 rounded-2xl bg-white/60 backdrop-blur-lg shadow-md flex flex-col gap-3 transition-all duration-500">
-          {["about", "projects", "reflections", "contact"].map((section) => (
+          {[
+            { id: "about", label: "About" },
+            { id: "projects", label: "Projects" },
+            { id: "experience", label: "Experience" },
+            { id: "contact", label: "Contact" },
+          ].map(({ id, label }) => (
             <button
-              key={section}
-              onClick={() => scrollToSection(section)}
+              key={id}
+              onClick={() => scrollToSection(id)}
               className={`text-sm font-medium text-left transition-all ${
-                active === section
+                active === id
                   ? "text-black font-semibold"
                   : "text-gray-600 hover:text-black"
               }`}
               suppressHydrationWarning
             >
-              {section.charAt(0).toUpperCase() + section.slice(1)}
+              {label}
             </button>
           ))}
         </div>
