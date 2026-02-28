@@ -46,7 +46,7 @@ export function AboutSection() {
 
   // Typing effect
   const fullText =
-    "Hi, my name is Faza Ulul Ilma. I’m an undergraduate student in Informatics Engineering at Airlangga University. I’m really interested in UI/UX design and front-end development. I enjoy creating digital experiences that are easy to use and look good. My goal is to work as a UI/UX designer in a company where I can learn, grow, and make products that help people."
+    "Hi, I’m Faza Ulul Ilma, an Informatics Engineering student at Airlangga University. I’m interested in building digital solutions through a combination of design thinking, web development, and system understanding. I enjoy turning ideas into structured, functional, and user-friendly experiences that create real impact."
   const [typedText, setTypedText] = useState("")
 
   useEffect(() => {

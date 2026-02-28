@@ -6,7 +6,7 @@ import "./globals.css"
 import { BackgroundDecor } from "@/components/background-decor"
 import { ScrollRevealProvider } from "@/components/scroll-reveal-provider"
 import { Suspense } from "react"
-import { Poppins } from "next/font/google"
+import { Poppins, Fredoka } from "next/font/google"
 
 export const metadata: Metadata = {
   title: "Modern Portfolio - Creative Developer & Designer",
@@ -16,8 +16,14 @@ export const metadata: Metadata = {
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
+})
+
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-fredoka",
 })
 
 export default function RootLayout({
@@ -27,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`font-sans ${poppins.variable} ${GeistMono.variable} antialiased`}>
+      <body className={`font-sans ${poppins.variable} ${fredoka.variable} ${GeistMono.variable} antialiased`}>
         <Suspense fallback={<div />}>
           <BackgroundDecor />
           <ScrollRevealProvider />

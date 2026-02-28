@@ -63,10 +63,9 @@ export function HeroSection() {
               data-reveal
               data-reveal-delay="200"
             >
-              I’m a creative tech enthusiast who enjoys turning ideas into
-              user-friendly designs. My focus is on UI/UX design and front-end
-              development to create digital products that feel intuitive and
-              visually appealing.
+              I’m an Informatics Engineering student interested in design, 
+              development, and system analysis. I enjoy turning ideas into practical 
+              digital solutions that are both intuitive and functional.
             </p>
 
             <div

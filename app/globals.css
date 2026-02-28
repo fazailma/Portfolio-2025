@@ -1,11 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Import Google Fonts (Poppins + Fredoka) */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap');
-
-@custom-variant dark (&:is(.dark *));
-
 /* Root variables */
 :root {
   --background: oklch(1 0 0);
@@ -50,7 +45,7 @@
 }
 
 /* Tailwind theme mapping */
-@theme inline {
+@theme {
   --font-sans: var(--font-body);
   --font-mono: var(--font-body);
   --color-background: var(--background);
