@@ -12,7 +12,7 @@ export function ExperienceSection() {
       title: "Media & Information Staff - BEM Universitas Airlangga",
       period: "2025",
       description: "Contributed to the Media & Information division by designing digital visual content to support organizational branding and event publications.",
-      images: ["/assets/bem1.jpg", "/assets/bem1b.jpg", "/assets/bem1c.jpg"],
+      images: ["/assets/2.jpeg", "/assets/3.jpeg", "/assets/6.jpeg"],
       achievements: [
         "Designed Instagram feeds for campus programs and events",
         "Created digital certificates for participants and committees",
@@ -24,7 +24,7 @@ export function ExperienceSection() {
       title: "Media Creative Staff - BEM Vokasi Universitas Airlangga",
       period: "2024",
       description: "Handled visual content production for organizational publications and digital campaigns.",
-      images: ["/assets/vokasi1.jpg", "/assets/vokasi2.jpg"],
+      images: ["/assets/1.jpeg", "/assets/4.jpeg", "/assets/5.jpeg"],
       achievements: [
         "Designed Instagram feed content for organizational programs",
         "Created YouTube cover designs for official publications",
